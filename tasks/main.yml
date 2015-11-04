@@ -49,7 +49,7 @@
 
 # For using instance to SSH tunnel into VPC machines:
 
-- name: Allow all ssh-hosts
+- name: Allow all ssh-hosts without key checking
   lineinfile:
     dest: /home/ubuntu/.ssh/config
     line: "Host *"
