@@ -1,8 +1,8 @@
 ## Ansible AWS NAT role
-An ansible role that creates an Ubuntu based AMI that's configured to be a used for a
+An ansible role thar configures an Ubuntu based AMI to be a used for a
 NAT instance to route traffic from a private VPC subnet.
-It the AMI will be used to launch an instance into a scaling group have a failover
-when the instance goes down. It's for this reason reusing an attached ENI so routing
+The resulting AMI can be used to launch an instance into a scaling group to have a failover
+when the instance goes down. It's for this reason reusing an unattached ENI so routing
 proceeds to work without updating VPC routing tables or IP/DNS records for things pointing to the NAT instance.
 See this blog article fro the idea behind this concept:
 http://www.cakesolutions.net/teamblogs/making-aws-nat-instances-highly-available-without-the-compromises
@@ -13,8 +13,8 @@ For hotplugging the ENI into Ubuntu this role uses ubuntu-ec2net utils. See here
 They are derived from the utils AWS provides for their own Linux flavour http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#ec2-net-utils
 
 ## Requirements
-- AWS account
-- Ubuntu base image
+- AWS account with VPC prepared
+- AWS Ubuntu base image
 - Unattached ENI interface with source/dest check disabled
 
 ## Role Variables
@@ -22,14 +22,14 @@ They are derived from the utils AWS provides for their own Linux flavour http://
 * `vpc` - this should contain the return values of the VPC setup with the Ansible VPC module
 
 ## Dependencies
-Ansible
+Depends on no other ansible roles.
 
 ## Example Playbook
-Just include the role in your play. For example:
+Just include the role in your play after you created VPC and ENI. See role example at the end:
 
 ```yaml
 # Example on how to meet the preconditions for this role:
-- name: Create VPC and ENI
+- name: Create ENI and add it to the VPC routing
   hosts: localhost
   tasks:
     - name: Create ENI
@@ -67,9 +67,11 @@ Just include the role in your play. For example:
                 gw: "{{ pf_nat_eni.interface.id }}"
       register: vpc
 
+# Startup ec2 instance...
+
 # Role usage example:
-- name: Create NAT AMI
-  hosts: ami_backing_instance
+- name: Configure NAT instance for AMI
+  hosts: ami_baking_instance
   remote_user: ubuntu
   vars:
     nat_eni: "{{ hostvars['localhost']['nat_eni'] }}"
@@ -78,7 +80,10 @@ Just include the role in your play. For example:
     - { role: mpx.aws_nat, nat_eni_id: "{{nat_eni.interface.id}}", vpc: "{{my_vpc}}" }
   tasks:
     # ...
+
+# Create AMI for autoscaling...
 ```
+The reulting AMI will auto attach to the ENI (which survives all the reboots).
 
 You can find the `ec2_eni` module here: https://github.com/ansible/ansible-modules-extras/blob/devel/cloud/amazon/ec2_eni.py
 
