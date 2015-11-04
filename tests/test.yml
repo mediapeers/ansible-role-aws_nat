@@ -2,6 +2,6 @@
 - hosts: localhost
   remote_user: root
   vars:
-    vpc_stub: { subnets: [ {cidr: 10.10.1.0/24}, {cidr: 10.10.2.0/24 } ] }
+    vpc_stub: { subnets: [ {cidr: 10.10.1.0/24, resource_tags: {'Role': 'private'} }, {cidr: 10.10.2.0/24, resource_tags: {'Role': 'private'} } ] }
   roles:
     - { role: ansible-role-aws_nat, nat_eni_id: 'eni-bd14eb55', vpc: "{{vpc_stub}}" }
