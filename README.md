@@ -7,7 +7,7 @@ proceeds to work without updating VPC routing tables or IP/DNS records for thing
 See this blog article fro the idea behind this concept:
 http://www.cakesolutions.net/teamblogs/making-aws-nat-instances-highly-available-without-the-compromises
 
-Setting up the ENI and VPC is not par of this role!
+Setting up the ENI and VPC is not part of this role!
 
 For hotplugging the ENI into Ubuntu this role uses ubuntu-ec2net utils. See here https://github.com/ademaria/ubuntu-ec2net
 They are derived from the utils AWS provides for their own Linux flavour http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#ec2-net-utils
