@@ -3,7 +3,6 @@
 
 - name: Install AWS CLI package
   apt: name=awscli state=latest
-  when: ansible_env.TRAVIS is undefined
 
 # ENI management:
 
