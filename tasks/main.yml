@@ -1,9 +1,17 @@
 ---
-# tasks file for mpx.aws_nat
+# Tasks file for mpx.aws_nat
 
-- name: copy first file
-  copy: src={{item.src}} dest={{item.dest}} owner=root mode={{item.mode}}
-  sudo: yes
+- name: Install AWS CLI package
+  apt: name=awscli state=latest
+
+# ENI management:
+
+- name: Copy files for ubuntu-ec2net utils. This will hotplug the ENI and sets up the interface and routes correctly
+  copy:
+    src:    "{{item.src}}"
+    dest:   "{{item.dest}}"
+    owner:  root
+    mode:   "{{item.mode}}"
   with_items:
     - { "src": "53-ec2-network-interfaces.rules", "dest": "/etc/udev/rules.d", "mode": 644 }
     - { "src": "75-persistent-net-generator.rules", "dest": "/etc/udev/rules.d", "mode": 644 }
@@ -11,3 +19,37 @@
     - { "src": "ec2net-functions", "dest": "/etc/network", "mode": 644 }
     - { "src": "ec2net.hotplug", "dest": "/etc/network", "mode": 744 }
 
+- name: Attach the preconfigured NAT network interface (ENI) on bootup for VPC routing (as eth1)
+  lineinfile:
+    dest: /etc/rc.local
+    insertbefore: "exit 0"
+    line: "curl --silent {{aws_meta_endpoint}}/instance-id | xargs aws ec2 attach-network-interface --network-interface-id {{nat_eni_id}} --device-index 1 --instance-id >> /var/log/rc.local.log 2>&1"
+
+# NAT configurations:
+
+- name: Allow IPv4 NAT routing/forwarding
+  lineinfile:
+    dest: /etc/sysctl.conf
+    line: "net.ipv4.ip_forward=1"
+
+- name: Add iptables masquerading rule for NAT functionality on bootup
+  lineinfile:
+     dest: /etc/rc.local
+     insertbefore: "exit 0"
+     line: "iptables -t nat -A POSTROUTING -o eth1 -s {{ item.cidr }} -j MASQUERADE"
+   with_items: vpc.subnets
+   when: item.resource_tags['Role'] == 'private'
+
+- name: Shutdown network interface eth0 after boot (using eth1 only)
+  lineinfile:
+    dest: /etc/rc.local
+    insertbefore: "exit 0"
+    line: "sleep 30 && ifdown eth0"
+
+# For using NAT to tunnel into VPC machines:
+- name: Allow all ssh-hosts
+  lineinfile:
+    dest: /home/ubuntu/.ssh/config
+    line: "Host *\n StrictHostKeyChecking no"
+    state: present
+    create: yes

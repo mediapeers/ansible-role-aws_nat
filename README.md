@@ -18,7 +18,8 @@ They are derived from the utils AWS provides for their own Linux flavour http://
 - Unattached ENI interface with source/dest check disabled
 
 ## Role Variables
-`eni_id: eni-abc123 # The id of the ENI to be attached, create it before and add it to your VPC routing table`
+* `nat_eni_id: eni-abc123` - The id of the ENI to be attached, create it before and add it to your VPC routing table
+* `vpc` - this should contain the return values of the VPC setup with the Ansible VPC module
 
 ## Dependencies
 Ansible
@@ -27,11 +28,59 @@ Ansible
 Just include the role in your play. For example:
 
 ```yaml
-- hosts: ami_backing_instance
+# Example on how to meet the preconditions for this role:
+- name: Create VPC and ENI
+  hosts: localhost
+  tasks:
+    - name: Create ENI
+      ec2_eni:
+        # some setup stuff
+      register: nat_eni
+
+    - name: Disable source/dest check
+      ec2_eni:
+        eni_id: "{{nat_eni.interface.id}}"
+        source_dest_check: false
+      register: nat_eni
+
+    - name: Allocating EIP
+      ec2_eip:
+        in_vpc: true
+        # some other params
+      register: nat_eip
+
+    - name: Attaching EIP to ENI
+      ec2_eip:
+        device_id: "{{nat_eni.interface.id}}"
+        ip: "{{nat_eip.public_ip}}"
+        region: my_region
+
+    - name: Add ENI to VPC routing
+      ec2_vpc:
+        # some other params
+        route_tables:
+          - subnets:
+            - 172.1.2.0/24
+            - 172.1.3.0/24
+            routes:
+              - dest: 0.0.0.0/0
+                gw: "{{ pf_nat_eni.interface.id }}"
+      register: vpc
+
+# Role usage example:
+- name: Create NAT AMI
+  hosts: ami_backing_instance
   remote_user: ubuntu
+  vars:
+    nat_eni: "{{ hostvars['localhost']['nat_eni'] }}"
+    my_vpc: "{{ hostvars['localhost']['vpc'] }}"
   roles:
-    - { role: mpx.aws_nat, eni_id: 'eni-a33db567' }
+    - { role: mpx.aws_nat, nat_eni_id: "{{nat_eni.interface.id}}", vpc: "{{my_vpc}}" }
+  tasks:
+    # ...
 ```
+
+You can find the `ec2_eni` module here: https://github.com/ansible/ansible-modules-extras/blob/devel/cloud/amazon/ec2_eni.py
 
 ## License
 BSD
