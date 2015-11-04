@@ -48,9 +48,16 @@
     line: "sleep 30 && ifdown eth0"
 
 # For using instance to SSH tunnel into VPC machines:
+
 - name: Allow all ssh-hosts
   lineinfile:
     dest: /home/ubuntu/.ssh/config
-    line: "Host *\n StrictHostKeyChecking no"
+    line: "Host *"
     state: present
     create: yes
+
+- lineinfile:
+    dest: /home/ubuntu/.ssh/config
+    insertafter: "Host *"
+    line: "StrictHostKeyChecking no"
+    state: present
