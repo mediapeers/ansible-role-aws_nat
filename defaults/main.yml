@@ -4,3 +4,4 @@
 # nat_eni_id: 'abc123' # required variable
 # when using the ansible ENI module you can get is like this {{my_nat_eni.interface.id}}
 
+aws_region: us-east-1

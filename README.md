@@ -22,6 +22,7 @@ They are derived from the utils AWS provides for their own Linux flavour http://
 ## Role Variables
 * `nat_eni_id: eni-abc123` - The id of the ENI to be attached, create it before and add it to your VPC routing table
 * `vpc` - this should contain the return values of the VPC setup with the Ansible VPC module
+* `aws_region: us-east-1` - The region your VPC/NAT instance runs in. Used for the AWS CLI command configuration
 
 ## Dependencies
 Depends on no other ansible roles.
@@ -79,7 +80,7 @@ Just include the role in your play after you created VPC and ENI. See role examp
     nat_eni: "{{ hostvars['localhost']['nat_eni'] }}"
     my_vpc: "{{ hostvars['localhost']['vpc'] }}"
   roles:
-    - { role: mpx.aws_nat, nat_eni_id: "{{nat_eni.interface.id}}", vpc: "{{my_vpc}}" }
+    - { role: mpx.aws_nat, nat_eni_id: "{{nat_eni.interface.id}}", vpc: "{{my_vpc}}", aws_region: 'us-west-1' }
   tasks:
     # ...
 

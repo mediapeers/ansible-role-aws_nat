@@ -1,8 +1,26 @@
 ---
 # Tasks file for mpx.aws_nat
 
+# Install and configure AWS CLI:
+
 - name: Install AWS CLI package
   apt: name=awscli state=latest
+
+- name: Creates AWC CLI config directory
+  file:
+    path: /root/.aws
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+
+- name: Add AWS CLI config for root
+  template:
+    src: config.j2
+    dest: /root/.aws/config
+    owner: root
+    group: root
+    mode: 0600
 
 # ENI management:
 
