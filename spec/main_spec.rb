@@ -5,6 +5,17 @@ describe "AWS NAT setup" do
     it { should be_installed }
   end
 
+  describe file('/root/.aws') do
+    it { should be_directory }
+    it { should be_mode(775) }
+  end
+
+  describe file('/root/.aws/config') do
+    it { should be_file }
+    it { should be_mode(600) }
+    its(:content) { should include("region = us-east-1") }
+  end
+
   describe file('/etc/udev/rules.d/53-ec2-network-interfaces.rules') do
     it { should be_file }
     it { should be_owned_by('root') }
