@@ -1,7 +1,13 @@
 require 'spec_helper'
 
 describe "AWS NAT setup" do
-  describe package('awscli') do
+
+  # Test if we are root (to run all the tests)
+  describe command('whoami') do
+    its(:stdout) { should eq "root\n" }
+  end
+
+  package('awscli') do
     it { should be_installed }
   end
 
