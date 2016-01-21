@@ -1,6 +1,6 @@
 ---
 - hosts: localhost
-  remote_user: root
+  become: true
   vars:
     vpc: {
       subnets: [ {cidr: 10.10.1.0/24, resource_tags: {'Role': 'private'} }, {cidr: 10.10.2.0/24, resource_tags: {'Role': 'private'} } ],
