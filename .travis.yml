@@ -14,7 +14,7 @@ install:
   # Install ruby for and serverspec gem
   - sudo apt-get install -y ruby
   - ruby -v
-  - gem install serverspec
+  - sudo gem install serverspec
 
   # Install Ansible through pip
   - sudo apt-get install -y python-pip python-dev
