@@ -9,10 +9,14 @@ env:
 
 before_install:
   - sudo apt-get update -qq
+  - sudo apt-get remove -y ruby1.9.3
 
 install:
   # Install ruby for and serverspec gem
   - sudo apt-get install -y ruby2.0
+  - ruby -v
+  - which ruby
+  - sudo which ruby
   - sudo ruby -v
   - sudo gem install serverspec
 
