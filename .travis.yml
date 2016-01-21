@@ -1,9 +1,8 @@
 ---
 sudo: required
 dist: trusty
-
-language: python
-python: "2.7"
+# Do not use the travis languague setups (install ruby/python manually) for ansible tests!
+language: shell
 
 env:
   - SITE=test.yml
@@ -12,8 +11,17 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  # Install Ansible.
-  - pip install ansible
+  # Install ruby for and serverspec gem
+  - sudo apt-get install -y ruby
+  - ruby -v
+  - gem install serverspec
+
+  # Install Ansible through pip
+  - sudo apt-get install -y python-pip python-dev
+  - python --version
+  - pip --version
+  - sudo -H pip install ansible
+  - ansible --version
 
   # Add ansible.cfg to pick up roles path.
   - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
@@ -23,11 +31,14 @@ script:
   - "ansible-playbook -i tests/inventory tests/$SITE --syntax-check"
 
   # Run the role/playbook with ansible-playbook.
-  - "ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo"
+  - "ansible-playbook -i tests/inventory tests/$SITE --connection=local"
 
   # Run the role/playbook again, checking to make sure it's idempotent.
   - >
-    ansible-playbook -i tests/inventory tests/$SITE --connection=local --sudo
+    ansible-playbook -i tests/inventory tests/$SITE --connection=local
     | grep -q 'changed=0.*failed=0'
     && (echo 'Idempotence test: pass' && exit 0)
     || (echo 'Idempotence test: fail' && exit 1)
+
+  # Run serverspec
+  - rake spec
