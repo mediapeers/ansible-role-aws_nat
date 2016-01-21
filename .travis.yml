@@ -14,7 +14,7 @@ install:
   # Install ruby for and serverspec gem
   - sudo apt-get install -y ruby
   - ruby -v
-  - sudo gem install serverspec
+  - gem install serverspec
 
   # Install Ansible through pip
   - sudo apt-get install -y python-pip python-dev
@@ -41,4 +41,4 @@ script:
     || (echo 'Idempotence test: fail' && exit 1)
 
   # Run serverspec
-  - sudo rake spec
+  - rake spec

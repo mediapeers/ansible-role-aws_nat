@@ -2,6 +2,7 @@ require 'serverspec'
 require 'yaml'
 
 set :backend, :exec
+set :sudo_options, '-s'
 #set :pre_command, 'sudo -s'
 
 # Identifier for specs being run from inside this role
