@@ -12,7 +12,7 @@ before_install:
 
 install:
   # Install ruby for and serverspec gem
-  - sudo apt-get install -y ruby
+  - sudo apt-get install -y ruby2.0
   - sudo ruby -v
   - sudo gem install serverspec
 
