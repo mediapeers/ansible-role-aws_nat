@@ -10,7 +10,7 @@ env:
 before_install:
   - sudo apt-get update -qq
   # Clean up all the weird rubies (none coming from apt packages) from system
-  - sudo rm /usr/bin/ruby /usr/bin/gem /usr/bin/rake
+  - sudo rm /usr/bin/ruby /usr/bin/gem
   - sudo rm -r /home/travis/.rvm/
 
 install:
