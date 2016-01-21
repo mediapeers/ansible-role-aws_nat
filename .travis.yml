@@ -9,14 +9,16 @@ env:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get remove -y ruby1.9.3
+  # Clean up all the weird rubies (none coming from apt packages) from system
+  - rm /usr/bin/ruby /usr/bin/gem /usr/bin/rake
+  - rm -r /home/travis/.rvm/
 
 install:
-  # Install ruby for and serverspec gem
+  # Install ruby and serverspec gem as root
   - sudo apt-get install -y ruby2.0
-  - ruby -v
-  - which ruby
-  - sudo which ruby
+  - ln -s /usr/bin/ruby /usr/bin/ruby2.0
+  - ln -s /usr/bin/gem /usr/bin/gem2.0
+  - ln -s /usr/bin/rake /usr/bin/rake2.0
   - sudo ruby -v
   - sudo gem install serverspec
 
