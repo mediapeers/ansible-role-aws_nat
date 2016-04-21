@@ -66,7 +66,7 @@ Just include the role in your play after you created VPC and ENI. See role examp
             - 172.1.3.0/24
             routes:
               - dest: 0.0.0.0/0
-                gw: "{{ pf_nat_eni.interface.id }}"
+                gw: "{{ nat_eni.interface.id }}"
       register: vpc
 
 # Startup ec2 instance...
