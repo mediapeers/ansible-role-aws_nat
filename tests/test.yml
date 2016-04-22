@@ -2,7 +2,7 @@
 - hosts: localhost
   become: true
   vars:
-    vpc_private_subnets: [ {cidr: 10.10.1.0/24, resource_tags: {'Role': 'private'} }, {cidr: 10.10.2.0/24, resource_tags: {'Role': 'private'} } ],
+    vpc_private_subnets: [ {cidr: 10.10.1.0/24, resource_tags: {'Role': 'private'} }, {cidr: 10.10.2.0/24, resource_tags: {'Role': 'private'} } ]
     aws_region: us-east-1
     nat_eni_id: 'eni-bd14eb55'
   roles:
