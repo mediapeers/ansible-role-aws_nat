@@ -3,3 +3,9 @@
 
 # nat_eni_id: 'abc123' # required variable
 # when using the ansible ENI module you can get is like this {{my_nat_eni.interface.id}}
+
+# Overwrite this with your own region:
+aws_region: us-east-1
+
+# Set this to a collection of private VPC subnets (should contain the dict key cidr)
+# vpc_private_subnets: []
