@@ -56,7 +56,6 @@
      insertbefore: "exit 0"
      line: "iptables -t nat -A POSTROUTING -o eth1 -s {{ item.cidr }} -j MASQUERADE"
   with_items: vpc_private_subnets
-  when: item.resource_tags['Role'] == 'private'
 
 - name: Shutdown network interface eth0 after boot (using eth1 only)
   lineinfile:
