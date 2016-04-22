@@ -22,7 +22,7 @@ They are derived from the utils AWS provides for their own Linux flavour http://
 ## Role Variables
 * `nat_eni_id: eni-abc123` - The id of the ENI to be attached, create it before and add it to your VPC routing table
 * `aws_region: us-east-1` - AWS region your VPC is in
-* `vpc_private_subnets` - this should contain a list of subnet dictioanaries (like the ones returned by ec2 modules), this role looks for the cidr dict value.
+* `vpc_private_subnets` - this should contain a list of subnet dictioanaries (like the ones returned by ec2 modules), this role looks for the `cidr_block` dict value.
 
 ## Dependencies
 Depends on no other ansible roles.
@@ -35,6 +35,8 @@ Just include the role in your play after you created VPC and ENI. See role examp
 - name: Create ENI and add it to the VPC routing
   hosts: localhost
   tasks:
+    # Create VPC and subnets first and save the private subnets in the variable vpc_private_subnets
+
     - name: Create ENI
       ec2_eni:
         # some setup stuff
@@ -56,19 +58,16 @@ Just include the role in your play after you created VPC and ENI. See role examp
       ec2_eip:
         device_id: "{{nat_eni.interface.id}}"
         ip: "{{nat_eip.public_ip}}"
-        region: my_region
+        region: "{{ my_region }}"
 
     - name: Add ENI to VPC routing
-      ec2_vpc:
+      ec2_vpc_route_table:
         # some other params
-        route_tables:
-          - subnets:
-            - 172.1.2.0/24
-            - 172.1.3.0/24
-            routes:
-              - dest: 0.0.0.0/0
-                gw: "{{ nat_eni.interface.id }}"
-      register: vpc
+        subnets: "{{ vpc_private_subnets|list|map(attribute='id')|list }}"
+        routes:
+          - dest: 0.0.0.0/0
+            interface_id: "{{ nat_eni.interface.id }}"
+        region: "{{ my_region }}"
 
 # Startup ec2 instance...
 
@@ -78,15 +77,16 @@ Just include the role in your play after you created VPC and ENI. See role examp
   remote_user: ubuntu
   vars:
     nat_eni: "{{ hostvars['localhost']['nat_eni'] }}"
-    subnets: "{{ hostvars['localhost']['vpc']['subnets'] }}"
+    subnets: "{{ hostvars['localhost']['vpc_private_subnets'] }}"
   roles:
-    - { role: mpx.aws_nat, nat_eni_id: "{{nat_eni.interface.id}}", vpc_private_subnets: "{{subnets}}", aws_region: us-east-1 }
+    - { role: mpx.aws_nat, nat_eni_id: "{{nat_eni.interface.id}}", vpc_private_subnets: "{{subnets}}", aws_region: "{{ my_region }}" }
   tasks:
     # ...
 
 # Create AMI for autoscaling...
 ```
-The reulting AMI will auto attach to the ENI (which survives all the reboots).
+
+The reulting AMI will auto attach to the ENI (which can be reused for new instances).
 
 You can find the `ec2_eni` module here: https://github.com/ansible/ansible-modules-extras/blob/devel/cloud/amazon/ec2_eni.py
 
