@@ -6,7 +6,8 @@ NAT instance to route traffic from a private VPC subnet.
 The resulting AMI can be used to launch an instance into a scaling group to have a failover
 when the instance goes down. It's for this reason reusing an unattached ENI so routing
 proceeds to work without updating VPC routing tables or IP/DNS records for things pointing to the NAT instance.
-See this blog article fro the idea behind this concept:
+
+Read this blog article for the idea behind this concept:
 http://www.cakesolutions.net/teamblogs/making-aws-nat-instances-highly-available-without-the-compromises
 
 Setting up the ENI and VPC is not part of this role!
@@ -79,14 +80,14 @@ Just include the role in your play after you created VPC and ENI. See role examp
     nat_eni: "{{ hostvars['localhost']['nat_eni'] }}"
     subnets: "{{ hostvars['localhost']['vpc_private_subnets'] }}"
   roles:
-    - { role: mpx.aws_nat, nat_eni_id: "{{nat_eni.interface.id}}", vpc_private_subnets: "{{subnets}}", aws_region: "{{ my_region }}" }
+    - { role: mediapeers.aws_nat, nat_eni_id: "{{nat_eni.interface.id}}", vpc_private_subnets: "{{subnets}}", aws_region: "{{ my_region }}" }
   tasks:
     # ...
 
 # Create AMI for autoscaling...
 ```
 
-The reulting AMI will auto attach to the ENI (which can be reused for new instances).
+The resulting AMI will auto attach to the ENI (which can be reused for new instances).
 
 You can find the `ec2_eni` module here: https://github.com/ansible/ansible-modules-extras/blob/devel/cloud/amazon/ec2_eni.py
 

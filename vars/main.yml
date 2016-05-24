@@ -1,5 +1,5 @@
 ---
-# vars file for mpx.aws_nat
+# vars file for mediapeers.aws_nat
 
 # AWS endpoint to retrieve instance information
 aws_meta_endpoint: "http://169.254.169.254/latest/meta-data"
