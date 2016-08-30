@@ -58,7 +58,7 @@
      dest: /etc/rc.local
      insertbefore: "exit 0"
      line: "iptables -t nat -A POSTROUTING -o eth1 -s {{ item.cidr_block }} -j MASQUERADE"
-  with_items: vpc_private_subnets
+  with_items: '{{ vpc_private_subnets }}'
 
 - name: Shutdown network interface eth0 after boot (using eth1 only)
   lineinfile:
