@@ -49,7 +49,8 @@ describe "AWS NAT setup" do
   describe file('/etc/rc.local') do
     it { should be_file }
     its(:content) { should include(
-      "curl --silent http://169.254.169.254/latest/meta-data/instance-id | xargs aws ec2 attach-network-interface --network-interface-id #{ANSIBLE_VARS.fetch('nat_eni_id', 'Fail')}"
+      "curl --silent http://169.254.169.254/latest/meta-data/instance-id | xargs " \
+      "/usr/local/bin/aws ec2 attach-network-interface --network-interface-id #{ANSIBLE_VARS.fetch('nat_eni_id', 'Fail')} --region #{ANSIBLE_VARS.fetch('aws_region', 'Fail')} --device-index 1"
     ) }
   end
 
