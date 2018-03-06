@@ -41,7 +41,7 @@
   lineinfile:
     dest: /etc/rc.local
     insertbefore: "exit 0"
-    line: "curl --silent {{aws_meta_endpoint}}/instance-id | xargs aws ec2 attach-network-interface --network-interface-id {{nat_eni_id}} --device-index 1 --instance-id >> /var/log/rc.local.log 2>&1"
+    line: "curl --silent {{aws_meta_endpoint}}/instance-id | xargs /usr/local/bin/aws ec2 attach-network-interface --network-interface-id {{nat_eni_id}} --region {{aws_region}} --device-index 1 --instance-id >> /var/log/rc.local.log 2>&1"
 
 # NAT configurations:
 
