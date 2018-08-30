@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mediapeers/ansible-role-aws_nat.svg?branch=master)](https://travis-ci.org/mediapeers/ansible-role-aws_nat)
+[![Build Status](https://travis-ci.com/mediapeers/ansible-role-aws_nat.svg?branch=master)](https://travis-ci.com/mediapeers/ansible-role-aws_nat)
 
 ## Ansible AWS NAT role
 An ansible role thar configures an Ubuntu based AMI to be a used for a
