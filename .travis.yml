@@ -20,7 +20,7 @@ install:
   - sudo ln -s /usr/bin/gem2.0 /usr/bin/gem
   - sudo ln -s /usr/bin/rake2.0 /usr/bin/rake
   - sudo ruby -v
-  - sudo gem install serverspec
+  - sudo gem install rubygems serverspec
 
   # Install Ansible through pip
   - sudo apt-get install -y python-pip python-dev
