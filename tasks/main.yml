@@ -4,7 +4,9 @@
 # Install and configure AWS CLI:
 
 - name: Install AWS CLI package
-  apt: name=awscli state=latest
+  apt:
+    name: awscli
+    state: present
 
 - name: Creates AWC CLI config directory
   file:
@@ -26,10 +28,10 @@
 
 - name: Copy files for ubuntu-ec2net utils. This will hotplug the ENI and sets up the interface and routes correctly
   copy:
-    src:    "{{item.src}}"
-    dest:   "{{item.dest}}"
+    src:    "{{ item.src }}"
+    dest:   "{{ item.dest }}"
     owner:  root
-    mode:   "{{item.mode}}"
+    mode:   "{{ item.mode }}"
   with_items:
     - { "src": "53-ec2-network-interfaces.rules", "dest": "/etc/udev/rules.d", "mode": 644 }
     - { "src": "75-persistent-net-generator.rules", "dest": "/etc/udev/rules.d", "mode": 644 }
@@ -41,7 +43,7 @@
   lineinfile:
     dest: /etc/rc.local
     insertbefore: "exit 0"
-    line: "curl --silent {{aws_meta_endpoint}}/instance-id | xargs /usr/local/bin/aws ec2 attach-network-interface --network-interface-id {{nat_eni_id}} --region {{aws_region}} --device-index 1 --instance-id >> /var/log/rc.local.log 2>&1"
+    line: "curl --silent {{ aws_meta_endpoint }}/instance-id | xargs /usr/local/bin/aws ec2 attach-network-interface --network-interface-id {{ nat_eni_id }} --region {{ aws_region }} --device-index 1 --instance-id >> /var/log/rc.local.log 2>&1"
 
 # NAT configurations:
 
@@ -55,9 +57,9 @@
 
 - name: Add iptables masquerading rule for NAT functionality on bootup
   lineinfile:
-     dest: /etc/rc.local
-     insertbefore: "exit 0"
-     line: "iptables -t nat -A POSTROUTING -o eth1 -s {{ item.cidr_block }} -j MASQUERADE"
+    dest: /etc/rc.local
+    insertbefore: "exit 0"
+    line: "iptables -t nat -A POSTROUTING -o eth1 -s {{ item.cidr_block }} -j MASQUERADE"
   with_items: '{{ vpc_private_subnets }}'
 
 - name: Shutdown network interface eth0 after boot (using eth1 only)
@@ -73,7 +75,7 @@
     dest: /home/ubuntu/.ssh/config
     line: "Host *"
     state: present
-    create: yes
+    create: true
 
 - lineinfile:
     dest: /home/ubuntu/.ssh/config
